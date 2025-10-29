@@ -1,10 +1,11 @@
 require('dotenv').config();
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 
 const cors = require("cors");
 const bodyParser = require("body-parser");
+
+const app = express();
 
 const PORT = process.env.PORT || 8080;
 const url  = process.env.MONGO_URL;
@@ -191,18 +192,22 @@ res.json(allPositions);
 
 //To get order from user and set it to database
 app.post('/newOrder', async(req,res)=>{
-let newOrder = new OrdersModel({
+try{
+const newOrder = new OrdersModel({
     name: req.body.name,
     qty: req.body.qty,
     price: req.body.price,
     mode: req.body.mode
 });
-newOrder.save();
+await newOrder.save();
 res.send("Response Saved!");
+}catch{
+    res.status(500).send("Error saving order: " + error.message);
+}
 });
 
 app.listen(PORT,()=>{
     console.log(`Listening to port ${8080}`);
     mongoose.connect(url);
     
-})
+});
